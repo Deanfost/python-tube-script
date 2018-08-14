@@ -3,7 +3,6 @@
 from pytube import YouTube
 import os
 
-audio_only = False
 print("\nWelcome user.")
 
 def verify_yn(selection):
