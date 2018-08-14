@@ -1,7 +1,6 @@
 """Entry point of application"""
 
 from pytube import YouTube
-from ffmpy import FFmpeg
 import os
 
 audio_only = False
