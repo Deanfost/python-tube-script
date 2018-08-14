@@ -1,11 +1,11 @@
 """Entry point of application"""
 
 from pytube import YouTube
+from ffmpy import FFmpeg
 import os
 
 audio_only = False
-
-print("Welcome user.")
+print("\nWelcome user.")
 
 def verify_yn(selection):
     # Only accept 'y/n'
@@ -19,56 +19,50 @@ def progress_callback(stream, chunk, file_handle, bytes_remaining):
     remaining = int(bytes_remaining * .0001)
     # Limit the print rate
     if remaining % 5 == 0:
-        print("Download progress: %dkb remaining" % remaining)
+        print("Download progress: %dKB remaining" % remaining)
 
 def on_finish_callback(stream, file_handle):
     # Called when download is finished
-    print("Download complete.")
+    size = int(stream.filesize * .00001)
+    print("Download complete (%sMB)." % size)
 
 def handle_input():
-    print("Please input a Youtube video's address. Prepend address with '-a ' to download ony audio.")
-    address = input()
-    yt = None
-    global audio_only
-    if address[0:3] == '-a ':
-        # Only download audio
-        audio_only = True
-        yt = YouTube(address[3:])
-    else:
-        # Download the best progressive stream
-        audio_only = False
-        yt = YouTube(address)
+    print("Usage: '[Video address] [Destination path]'")
+
+    console = input()
+
+    # Parse the command, check syntax
+    params = console.split(' ')
+    if len(params) != 2:
+        print("Invalid syntax.")
+        return
+
+    address = params[0]
+    path = params[1]
+
+    # Verify path
+    if not os.path.isdir(path):
+        print("Invalid path.")
+        return
+
+    yt = YouTube(address)
 
     print("\nVideo selected.")
-    print(yt.title)
+    print(yt.title + "\n(Best progressive stream)")
+    print("To path: " + path)
 
     print("\nDownload stream? y/n")
     selection = verify_yn(input())
     print("")
 
     if selection == 'y':
-        # Get a path, verify
-        print("Please specify a destination path.")
-        path = input()
-        while not os.path.isdir(path):
-            print("Invalid path, please try again.")
-            path = input()
-
-        if audio_only:
-            # Download the first audio stream
-            print("Downloading audio to Downloads...")
-            yt.register_on_progress_callback(progress_callback)
-            yt.register_on_complete_callback(on_finish_callback)
-            stream = yt.streams.filter(only_audio = True).first().download(path)
-        else:
-            # Download the first progressive stream to path (max at 720p)
-            print("Downloading progressive video to Downloads...")
-            yt.register_on_progress_callback(progress_callback)
-            yt.register_on_complete_callback(on_finish_callback)
-            stream = yt.streams.filter(progressive = True).first().download(path)
+        print("Downloading progressive video to path...")
+        yt.register_on_progress_callback(progress_callback)
+        yt.register_on_complete_callback(on_finish_callback)
+        stream = yt.streams.filter(progressive = True).first().download(path)
     else:
         # Quit the script
-        pass
+        return
 
 # Start the script
 handle_input()
