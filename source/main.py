@@ -63,4 +63,7 @@ def handle_input():
         return
 
 # Start the script
-handle_input()
+if __name__ == "__main__":
+    handle_input()
+else:
+    print("Please run 'main.py' as the top-level script.")
