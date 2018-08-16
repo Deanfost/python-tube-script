@@ -2,6 +2,7 @@
 
 from pytube import YouTube
 import os
+import math
 
 print("\nWelcome user.")
 
@@ -14,14 +15,14 @@ def verify_yn(selection):
 
 def progress_callback(stream, chunk, file_handle, bytes_remaining):
     # Called everytime there is a progress update
-    remaining = int(bytes_remaining * .0001)
+    remaining = math.ceil(bytes_remaining * .0001)
     # Limit the print rate
     if remaining % 5 == 0:
         print("Download progress: %dKB remaining" % remaining)
 
 def on_finish_callback(stream, file_handle):
     # Called when download is finished
-    size = int(stream.filesize * .00001)
+    size = math.ceil(stream.filesize * .000001)
     print("Download complete (%sMB)." % size)
 
 def handle_input():
