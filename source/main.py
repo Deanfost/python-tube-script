@@ -1,7 +1,9 @@
 """Entry point of application"""
 
 from pytube import YouTube
+
 import os
+import sys
 import math
 
 print("\nWelcome user.")
@@ -18,7 +20,7 @@ def progress_callback(stream, chunk, file_handle, bytes_remaining):
     remaining = math.ceil(bytes_remaining * .0001)
     # Limit the print rate
     if remaining % 5 == 0:
-        print("Download progress: %dKB remaining" % remaining)
+        sys.stdout.write("Download progress: %dKB \r" % remaining)
 
 def on_finish_callback(stream, file_handle):
     # Called when download is finished
