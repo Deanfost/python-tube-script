@@ -1,10 +1,13 @@
 """Entry point of application"""
 
-from pytube import YouTube
+import pytube
 
 import os
 import sys
 import math
+import re
+
+path = ""
 
 print("\nWelcome user.")
 
@@ -28,42 +31,54 @@ def on_finish_callback(stream, file_handle):
     print("Download complete (%sMB)." % size)
 
 def handle_input():
-    print("Usage: '[Video address] [Destination path]'")
+    print("Usage: '[Video address] [(optional) Destination path]'")
 
     console = input()
 
     # Parse the command, check syntax
     params = console.split(' ')
-    if len(params) != 2:
+    if len(params) > 2 or len(params) == 0:
         print("Invalid syntax.")
         return
 
+    global path
     address = params[0]
-    path = params[1]
 
-    # Verify path
-    if not os.path.isdir(path):
+    if len(params) == 2:
+        path = params[1]
+
+    # Verify path if specified
+    if path != "" and not os.path.isdir(path):
         print("Invalid path.")
         return
 
-    yt = YouTube(address)
+    try:
+        yt = pytube.YouTube(address)
 
-    print("\nVideo selected.")
-    print(yt.title + "\n(Best progressive stream)")
-    print("To path: " + path)
+        print("\nVideo selected.")
+        print(yt.title + "\n(Best progressive stream)")
+        if path != "":
+            print("To path: " + path)
+        else:
+            print("To working directory.")
 
-    print("\nDownload stream? y/n")
-    selection = verify_yn(input())
-    print("")
+        print("\nDownload stream? y/n")
+        selection = verify_yn(input())
+        print("")
 
-    if selection == 'y':
-        print("Downloading progressive video to path...")
-        yt.register_on_progress_callback(progress_callback)
-        yt.register_on_complete_callback(on_finish_callback)
-        stream = yt.streams.filter(progressive = True).first().download(path)
-    else:
-        # Quit the script
-        return
+        if selection == 'y':
+            print("Downloading progressive video to path...")
+            yt.register_on_progress_callback(progress_callback)
+            yt.register_on_complete_callback(on_finish_callback)
+            if path != "":
+                stream = yt.streams.filter(progressive = True).first().download(path)
+            else:
+                stream = yt.streams.filter(progressive = True).first().download()
+        else:
+            # Quit the script
+            return
+    except pytube.exceptions.RegexMatchError:
+        print("Invalid video address.")
 
 # Start the script
 if __name__ == "__main__":
