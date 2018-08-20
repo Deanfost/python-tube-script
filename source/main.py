@@ -5,7 +5,6 @@ import pytube
 import os
 import sys
 import math
-import re
 
 path = ""
 
