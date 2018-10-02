@@ -52,6 +52,7 @@ def handle_input():
         return
 
     try:
+        print("Fetching video...");
         yt = pytube.YouTube(address)
 
         print("\nVideo selected.")
