@@ -13,7 +13,7 @@ print("\nWelcome user.")
 def verify_yn(selection):
     # Only accept 'y/n'
     if not(selection == 'n' or selection == 'y'):
-        print("Invalid selection.\n")
+        print("Please type 'y' or 'n'.\n")
         return verify_yn(input())
     return selection
 
@@ -55,12 +55,20 @@ def handle_input():
         print("Fetching video...");
         yt = pytube.YouTube(address)
 
-        print("\nVideo selected.")
-        print(yt.title + "\n(Best progressive stream)")
+        # Print video info
+        print("\nVideo selected:")
+        print(yt.title)
+
+        length = yt.length
+        length = str(math.floor(int(length) / 60))
+        length_rem = str(int(yt.length) % 60)
+        print("Length - " + length + ":" + length_rem)
+        print("\n(Best progressive stream)")
+
         if path != "":
-            print("To path: " + path)
+            print("Downloading to path: " + path)
         else:
-            print("To working directory.")
+            print("Downloading to working directory.")
 
         print("\nDownload stream? y/n")
         selection = verify_yn(input())
